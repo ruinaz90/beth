@@ -11,8 +11,6 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 logging.debug("Start of program")
 
 recipes, recipe_url_titles, recipe_urls = [], [], []
-intab = " -"
-outtab = "-"
 
 page_url = 'https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/'
 req = Request(page_url, headers={'User-Agent': 'Mozilla/5.0'})  # Start connection
