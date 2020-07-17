@@ -17,18 +17,19 @@ from urllib.request import Request, urlopen
 from bs4 import BeautifulSoup as soup
 from datetime import date
 import xlsxwriter, winsound
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-print('starting')
-logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
+logging.debug("starting")
+# get the url first, and count how many recipes you want to scrape
+myurl = 'https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/' # gets url
+req = Request(myurl, headers={'User-Agent': 'Mozilla/5.0'}) # starts connection
+webpage = urlopen(req).read() # gets info
+pageSoup = soup(webpage, "html.parser") # parses html
 
-#get the url first, and count how many recipes you want to scrape
-myurl = 'https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/' #gets url
-req = Request(myurl, headers={'User-Agent': 'Mozilla/5.0'})#starts connection
-webpage = urlopen(req).read()#gets info
-pageSoup = soup(webpage, "html.parser") #parses html 
+logging.debug("get recipes")
+recipes = pageSoup.findAll("div", {"class":"post teaser-post search-post"}) # finds all recipes
 
-recipes = pageSoup.findAll("div",{"class":"archive-post"}) #finds all recipes
-
+logging.debug("create excel file")
 filename = "BB.xlsx"
 # Create a workbook and add a worksheet.
 workbook = xlsxwriter.Workbook(filename)
@@ -39,8 +40,10 @@ num = 1
 row = 0
 col = 0
 
-for r in recipes: #for each recipe, navigate to the list and download the ingredients [later instructions]
+logging.debug("recipe loop")
+for r in recipes: # for each recipe, navigate to the list and download the ingredients [later instructions]
     try:
+        logging.debug("trying")
         xtitle = r.a["title"]
         print(xtitle)
         title = xtitle.replace(" ", "-")
@@ -81,7 +84,9 @@ for r in recipes: #for each recipe, navigate to the list and download the ingred
 
     #if there'  problem, plug the supected url into google and select the first result.
     except:
+        logging.debug("exception")
         try:
+            logging.debug("exception try")
             logging.error('ERROR WITH ' + url) 
             from googlesearch import search 
             # to search 
@@ -92,7 +97,7 @@ for r in recipes: #for each recipe, navigate to the list and download the ingred
             webpage = urlopen(req).read()#gets info
             pageSoup = soup(webpage, "html.parser") #parses html  
 
-            r= pageSoup.find('div', {"id":"content"})
+            r = pageSoup.find('div', {"id":"content"})
 
             ingreds = r.find("ul", "wprm-recipe-ingredients")
             
@@ -104,8 +109,10 @@ for r in recipes: #for each recipe, navigate to the list and download the ingred
 
             logging.error('ERROR RESOLVED WITH ' + newurl)
         except:
+            logging.debug("exception message")
             logging.error('ERROR CANNOT BE SOLVED WITH ' + title) 
             pass
 
+logging.debug("closing workbook")
 workbook.close()
-print('not starting')
+logging.debug("end")
