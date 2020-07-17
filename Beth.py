@@ -18,8 +18,6 @@ from bs4 import BeautifulSoup as soup
 from datetime import date
 import xlsxwriter, winsound
 
-for i in range(2):
-	winsound.Beep(5000, 300)
 print('starting')
 logging.basicConfig(filename='app.log', filemode='w', format='%(name)s - %(levelname)s - %(message)s')
 
@@ -42,7 +40,6 @@ row = 0
 col = 0
 
 for r in recipes: #for each recipe, navigate to the list and download the ingredients [later instructions]
-    winsound.Beep(2500, 500)   
     try:
         xtitle = r.a["title"]
         print(xtitle)
@@ -111,7 +108,4 @@ for r in recipes: #for each recipe, navigate to the list and download the ingred
             pass
 
 workbook.close()
-for i in range(2):
-	winsound.Beep(5000, 300)
-winsound.Beep(5000, 1000)   
 print('not starting')
