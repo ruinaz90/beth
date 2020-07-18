@@ -1,14 +1,18 @@
 #! python3
-# Beth_mod.py - A modification of the original Beth.py file
-
 """
-Currently pulls the name of the recipe and generates the URL into lists.
+Beth_mod.py - Based on the Beth.py file
 
-recipes list = recipe names
-recipe_urls list = links to recipes
+Program currently does the following:
+    # Pulls recipe titles
+    # Creates URL based on recipe titles
+    # Creates Excel file with recipe names for worksheets
+
+[recipes] list = recipe names
+[recipe_urls] list = links to recipes
 """
 
 import logging
+import xlsxwriter
 from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
 
@@ -25,11 +29,11 @@ soup = BeautifulSoup(recipes_page, 'html.parser')  # Parse HTML
 
 logging.debug("Recipe loop")
 # Get recipe titles
-recipe_titles = soup.findAll('h2', {'class': 'post-title'})
+recipe_titles = soup.findAll('h2', attrs={'class': 'post-title'})
 for recipe_title in recipe_titles:
     # Recipe name
     recipe_name = recipe_title.text.strip()
-    recipes.append(recipe_name)
+    recipes.append(recipe_name.replace('’', '\''))  # Fix apostrophe
 
     # Recipe URL name
     recipe_lowercase = recipe_name.replace(" ", "-").lower()
@@ -43,4 +47,17 @@ for recipe_url_title in recipe_url_titles:
 
 logging.debug(f"var recipes: {recipes}")
 logging.debug(f"var recipe_urls: {recipe_urls}")
+
+# Create Excel file
+workbook = xlsxwriter.Workbook('BB.xlsx')
+
+# Create sheets with recipe names
+logging.debug("Worksheet loop")
+for recipe in recipes:
+    if ':' in recipe:  # Remove colon
+        worksheet = workbook.add_worksheet(recipe[:30].replace(':', ''))
+    else:
+        worksheet = workbook.add_worksheet(recipe[:30])
+
+workbook.close()
 logging.debug("Program end")
