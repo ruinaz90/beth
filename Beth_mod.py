@@ -1,14 +1,10 @@
 #! python3
 """
-Beth_mod.py - Based on the Beth.py file
+Beth_mod.py - Modified original Beth.py file
 
 Program currently does the following:
-    # Pulls recipe titles
-    # Creates URL based on recipe titles
+    # Pulls recipe titles and URL
     # Creates Excel file with recipe names for worksheets
-
-[recipes] list = recipe names
-[recipe_urls] list = links to recipes
 """
 
 import logging
