@@ -1,8 +1,14 @@
 #! python3
+# Beth_mod.py - A modification of the original Beth.py file
+
+"""
+Currently pulls the name of the recipe and generates the URL into lists.
+
+recipes list = recipe names
+recipe_urls list = links to recipes
+"""
 
 import logging
-import pandas as pd
-import requests
 from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
 
