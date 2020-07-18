@@ -53,14 +53,13 @@ for recipe_title, recipe_url in recipe_dict.items():
     soup = BeautifulSoup(recipe_page, 'html.parser')
 
     recipe = soup.find('div', {'id': 'content'})
-    ingredients = soup.find('ul', 'wprm-recipe-ingredients')
-    steps = soup.findAll('div', {'class': 'wprm-recipe-instruction-text'})
-
     row = 0
     col = 0
-    bold = workbook.add_format({'bold': True})
 
+    bold = workbook.add_format({'bold': True})
     worksheet.write(row, col, recipe_title, bold)
+    row += 1
+    worksheet.write(row, col, recipe_url)
 
 workbook.close()
 logging.debug("Program end")
