@@ -26,7 +26,7 @@ req = Request(page_url, headers={'User-Agent': 'Mozilla/5.0'})
 recipes_page = urlopen(req).read()
 soup = BeautifulSoup(recipes_page, 'html.parser')
 
-# Get recipe titles
+# Get recipe titles and URL
 logging.debug("Recipe loop")
 recipe_titles = soup.findAll('h2', {'class': 'post-title'})
 recipe_url_div = soup.findAll('div', {'class': 'post-image'})
@@ -43,23 +43,22 @@ for recipe_title, recipe_url in zip(recipe_titles, recipe_urls):
 
 logging.debug(f"recipe_dict: {recipe_dict}")
 
-# Create sheets with recipe names
-logging.debug("Worksheet loop")
+# Write to Excel file
+logging.debug("Excel loop")
 workbook = xlsxwriter.Workbook('BB.xlsx')
 for recipe_title, recipe_url in recipe_dict.items():
+    # Create sheets with recipe names
     worksheet = workbook.add_worksheet(recipe_title[:30].replace(':', ''))
+
+    # Connect to recipe page
     req = Request(recipe_url, headers={'User-Agent': 'Mozilla/5.0'})
     recipe_page = urlopen(req).read()
     soup = BeautifulSoup(recipe_page, 'html.parser')
 
-    recipe = soup.find('div', {'id': 'content'})
-    row = 0
-    col = 0
-
+    # Add recipe title and URL to sheet
     bold = workbook.add_format({'bold': True})
-    worksheet.write(row, col, recipe_title, bold)
-    row += 1
-    worksheet.write(row, col, recipe_url)
+    worksheet.write('A1', recipe_title, bold)
+    worksheet.write('A2', recipe_url)
 
 workbook.close()
 logging.debug("Program end")
