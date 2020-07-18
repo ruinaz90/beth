@@ -17,47 +17,54 @@ from bs4 import BeautifulSoup
 from urllib.request import Request, urlopen
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+# logging.disable(logging.CRITICAL)
 
 logging.debug("Program start")
-recipes, recipe_url_titles, recipe_urls = [], [], []
+recipe_dict = {}
+recipe_urls = []
 
+# Connect to site
 logging.debug("Connect to page")
 page_url = 'https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/'
-req = Request(page_url, headers={'User-Agent': 'Mozilla/5.0'})  # Start connection
-recipes_page = urlopen(req).read()  # Get info
-soup = BeautifulSoup(recipes_page, 'html.parser')  # Parse HTML
+req = Request(page_url, headers={'User-Agent': 'Mozilla/5.0'})
+recipes_page = urlopen(req).read()
+soup = BeautifulSoup(recipes_page, 'html.parser')
 
-logging.debug("Recipe loop")
 # Get recipe titles
-recipe_titles = soup.findAll('h2', attrs={'class': 'post-title'})
-for recipe_title in recipe_titles:
-    # Recipe name
+logging.debug("Recipe loop")
+recipe_titles = soup.findAll('h2', {'class': 'post-title'})
+recipe_url_div = soup.findAll('div', {'class': 'post-image'})
+for div in recipe_url_div:
+    recipe_urls.append(div.find('a')['href'])
+
+for recipe_title, recipe_url in zip(recipe_titles, recipe_urls):
+    # Format recipe name
     recipe_name = recipe_title.text.strip()
-    recipes.append(recipe_name.replace('’', '\''))  # Fix apostrophe
+    recipe_name = recipe_name.replace('’', '\'')
 
-    # Recipe URL name
-    recipe_lowercase = recipe_name.replace(" ", "-").lower()
-    recipe_url_titles.append(recipe_lowercase.replace('’', ''))
+    # Add name and URL to recipe_dict
+    recipe_dict[recipe_name] = recipe_url
 
-logging.debug("Recipe link loop")
-# Get recipe links
-for recipe_url_title in recipe_url_titles:
-    url = 'https://www.budgetbytes.com/' + recipe_url_title
-    recipe_urls.append(url)
-
-logging.debug(f"var recipes: {recipes}")
-logging.debug(f"var recipe_urls: {recipe_urls}")
-
-# Create Excel file
-workbook = xlsxwriter.Workbook('BB.xlsx')
+logging.debug(f"recipe_dict: {recipe_dict}")
 
 # Create sheets with recipe names
 logging.debug("Worksheet loop")
-for recipe in recipes:
-    if ':' in recipe:  # Remove colon
-        worksheet = workbook.add_worksheet(recipe[:30].replace(':', ''))
-    else:
-        worksheet = workbook.add_worksheet(recipe[:30])
+workbook = xlsxwriter.Workbook('BB.xlsx')
+for recipe_title, recipe_url in recipe_dict.items():
+    worksheet = workbook.add_worksheet(recipe_title[:30].replace(':', ''))
+    req = Request(recipe_url, headers={'User-Agent': 'Mozilla/5.0'})
+    recipe_page = urlopen(req).read()
+    soup = BeautifulSoup(recipe_page, 'html.parser')
+
+    recipe = soup.find('div', {'id': 'content'})
+    ingredients = soup.find('ul', 'wprm-recipe-ingredients')
+    steps = soup.findAll('div', {'class': 'wprm-recipe-instruction-text'})
+
+    row = 0
+    col = 0
+    bold = workbook.add_format({'bold': True})
+
+    worksheet.write(row, col, recipe_title, bold)
 
 workbook.close()
 logging.debug("Program end")
