@@ -47,7 +47,7 @@ workbook = xlsxwriter.Workbook('BB.xlsx')
 for recipe_title, recipe_url in recipe_dict.items():
     ingredients_list = []
 
-    # Create sheets with recipe names
+    # Create sheets with recipe names (up to 30 characters, remove colon from name)
     worksheet = workbook.add_worksheet(recipe_title[:30].replace(':', ''))
 
     # Connect to recipe page
