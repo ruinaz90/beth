@@ -41,12 +41,12 @@ for recipe_title, recipe_url in zip(recipe_titles, recipe_urls):
     # Add name and URL to recipe_dict
     recipe_dict[recipe_name] = recipe_url
 
-logging.debug(f"recipe_dict: {recipe_dict}")
-
 # Write to Excel file
 logging.debug("Excel loop")
 workbook = xlsxwriter.Workbook('BB.xlsx')
 for recipe_title, recipe_url in recipe_dict.items():
+    ingredients_list = []
+
     # Create sheets with recipe names
     worksheet = workbook.add_worksheet(recipe_title[:30].replace(':', ''))
 
@@ -55,10 +55,21 @@ for recipe_title, recipe_url in recipe_dict.items():
     recipe_page = urlopen(req).read()
     soup = BeautifulSoup(recipe_page, 'html.parser')
 
+    # Get ingredients
+    ingredients = soup.findAll('li', {'class': 'wprm-recipe-ingredient'})
+    for ingredient in ingredients:
+        ingredients_list.append(ingredient.text.strip())
+
     # Add recipe title and URL to sheet
     bold = workbook.add_format({'bold': True})
     worksheet.write('A1', recipe_title, bold)
     worksheet.write('A2', recipe_url)
+
+    # Add ingredients to sheet
+    row = 2
+    for ingredient in ingredients_list:
+        row += 1
+        worksheet.write(row, 0, ingredient)
 
 workbook.close()
 logging.debug("Program end")
