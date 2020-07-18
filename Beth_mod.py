@@ -34,3 +34,7 @@ logging.debug("Recipe link loop")
 for recipe_url_title in recipe_url_titles:
     url = 'https://www.budgetbytes.com/' + recipe_url_title
     recipe_urls.append(url)
+
+logging.debug(f"var recipes: {recipes}")
+logging.debug(f"var recipe_urls: {recipe_urls}")
+logging.debug("Program end")
