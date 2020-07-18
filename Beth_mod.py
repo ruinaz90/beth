@@ -8,15 +8,16 @@ from urllib.request import Request, urlopen
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-logging.debug("Start of program")
-
+logging.debug("Program start")
 recipes, recipe_url_titles, recipe_urls = [], [], []
 
+logging.debug("Connect to page")
 page_url = 'https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/'
 req = Request(page_url, headers={'User-Agent': 'Mozilla/5.0'})  # Start connection
 recipes_page = urlopen(req).read()  # Get info
 soup = BeautifulSoup(recipes_page, 'html.parser')  # Parse HTML
 
+logging.debug("Recipe loop")
 # Get recipe titles
 recipe_titles = soup.findAll('h2', {'class': 'post-title'})
 for recipe_title in recipe_titles:
@@ -28,6 +29,7 @@ for recipe_title in recipe_titles:
     recipe_lowercase = recipe_name.replace(" ", "-").lower()
     recipe_url_titles.append(recipe_lowercase.replace('’', ''))
 
+logging.debug("Recipe link loop")
 # Get recipe links
 for recipe_url_title in recipe_url_titles:
     url = 'https://www.budgetbytes.com/' + recipe_url_title
