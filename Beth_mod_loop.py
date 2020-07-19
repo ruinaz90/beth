@@ -18,9 +18,13 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 logging.debug("Program start")
 recipe_dict = {}
 recipe_urls = []
-urls = ['https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/', 'https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/breakfast-meal-prep/',\
-    "https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/chicken-meal-prep/", "https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/no-re-heat/",\
-    "https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/vegetarian-meal-prep/"]
+urls = [
+    'https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/',
+    'https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/breakfast-meal-prep/',
+    "https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/chicken-meal-prep/",
+    "https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/no-re-heat/",
+    "https://www.budgetbytes.com/category/extra-bytes/budget-friendly-meal-prep/vegetarian-meal-prep/"
+]
 BB_name = ['Budget Friendly Meal Prep', 'Breakfast Meal Prep', 'Chicken Meal Prep', 'No Reheat', 'Vegetarian Meal Prep']
 
 for i in range(len(urls)):
@@ -38,7 +42,7 @@ for i in range(len(urls)):
     recipe_url_div = soup.findAll('div', {'class': 'post-image'})
     for div in recipe_url_div:
         recipe_urls.append(div.find('a')['href'])
-    
+
     for recipe_title, recipe_url in zip(recipe_titles, recipe_urls):
         # Format recipe name
         recipe_name = recipe_title.text.strip()
@@ -50,7 +54,7 @@ for i in range(len(urls)):
     # Write to Excel file
     logging.debug("Excel loop")
     workbook = xlsxwriter.Workbook('BB_' + BB_name[i] + '.xlsx')
-    
+
     for recipe_title, recipe_url in recipe_dict.items():
         ingredients_list = []
         steps_list = []
@@ -70,10 +74,10 @@ for i in range(len(urls)):
 
         # Get steps
         steps = soup.findAll('li', {'class': 'wprm-recipe-instruction'})
-                       
-        for step in steps:
-            steps_list.append(step.text.strip())
-                
+
+        for index, step in enumerate(steps):
+            steps_list.append(f"{index + 1}. {step.text.strip()}")
+
         # Add recipe title and URL to sheet
         bold = workbook.add_format({'bold': True})
         worksheet.write('A1', recipe_title, bold)
