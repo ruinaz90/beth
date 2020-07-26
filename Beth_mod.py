@@ -45,7 +45,7 @@ for recipe_title, recipe_url in zip(recipe_titles, recipe_urls):
 logging.debug("Excel loop")
 workbook = xlsxwriter.Workbook('BB.xlsx')
 for recipe_title, recipe_url in recipe_dict.items():
-    ingredients_list = []
+    ingredients_list, steps_list = [], []
 
     # Create sheets with recipe names (up to 30 characters, remove colon from name)
     worksheet = workbook.add_worksheet(recipe_title[:30].replace(':', ''))
@@ -60,6 +60,11 @@ for recipe_title, recipe_url in recipe_dict.items():
     for ingredient in ingredients:
         ingredients_list.append(ingredient.text.strip())
 
+    # Get steps
+    steps = soup.findAll('li', {'class': 'wprm-recipe-instruction'})
+    for index, step in enumerate(steps):
+        steps_list.append(f"{index + 1}. {step.text.strip()}")
+
     # Add recipe title and URL to sheet
     bold = workbook.add_format({'bold': True})
     worksheet.write('A1', recipe_title, bold)
@@ -70,6 +75,12 @@ for recipe_title, recipe_url in recipe_dict.items():
     for ingredient in ingredients_list:
         row += 1
         worksheet.write(row, 0, ingredient)
+
+    # Add steps to sheet
+    row = len(ingredients_list) + 4
+    for step in steps_list:
+        row += 1
+        worksheet.write(row, 0, step)
 
 workbook.close()
 logging.debug("Program end")
